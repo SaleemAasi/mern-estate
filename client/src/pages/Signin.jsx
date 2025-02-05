@@ -1,8 +1,8 @@
-
 export default function Signin() {
+  console.log('hellwo')
   return (
     <div>
-      Signin
+signin
     </div>
-  )
+  );
 }

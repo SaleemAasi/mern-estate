@@ -14,13 +14,16 @@ function App() {
   return (
   <BrowserRouter>
 <Header/>
-  <Routes>
+<div style={{ paddingTop: "80px" }}>
+<Routes>
     <Route path='/'element={<Home/>}/>
     <Route path='/about'element={<About/>}/>
     <Route path='/profile'element={<Profile/>}/>
     <Route path='/signup'element={<Signup/>}/>
     <Route path='/signin'element={<Signin/>}/>
   </Routes>
+</div>
+
   </BrowserRouter>
   )
 }
