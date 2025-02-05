@@ -6,7 +6,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-md fixed w-full z-50">
+    <header className="bg-white shadow-md fixed w-full z-50 ">
       <div className="flex justify-between items-center max-w-6xl mx-auto px-6 py-4">
         {/* Logo */}
         <Link to="/" className="font-bold text-lg sm:text-2xl flex items-center space-x-1">
