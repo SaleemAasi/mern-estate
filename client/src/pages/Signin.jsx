@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice.js";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -15,6 +18,8 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signInStart()); // Dispatch signInStart to set loading state to true
+
     setLoading(true);
 
     try {
@@ -25,20 +30,25 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
       console.log(data);
 
       setLoading(false);
 
       if (res.ok) {
-        // Redirect to dashboard or home page after successful login
-        navigate("/");
+        // Dispatch signInSuccess to store user data in Redux
+        dispatch(signInSuccess(data));
+        navigate("/"); // Redirect to home or dashboard after successful login
       } else {
+        // Dispatch signInFailure to set error message in Redux
+        dispatch(signInFailure(data.message));
         alert(data.message);
       }
     } catch (error) {
       setLoading(false);
       console.error("Error during sign-in:", error);
+      dispatch(signInFailure("Something went wrong. Please try again."));
       alert("Something went wrong. Please try again.");
     }
   };
