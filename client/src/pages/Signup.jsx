@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import OAuth from "../components/OAuth";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -110,6 +111,7 @@ export default function Signup() {
               "Sign Up"
             )}
           </button>
+           <OAuth/>
         </form>
 
         {/* Divider */}
