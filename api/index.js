@@ -1,7 +1,7 @@
 
 import express from 'express';
 import mongoose from 'mongoose';
-
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js'; // Fix import (removed curly braces)
@@ -9,7 +9,7 @@ import authRouter from './routes/auth.route.js'; // Fix import (removed curly br
 dotenv.config(); // Load .env file
 
 const app = express();
-
+app.use(cookieParser())
 app.use(express.json()); // Middleware to parse JSON
 
 // Connect MongoDB

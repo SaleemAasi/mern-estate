@@ -20,9 +20,9 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(signInStart()); // Dispatch signInStart to set loading state to true
-
+  
     setLoading(true);
-
+  
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -31,16 +31,16 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
       console.log(data);
-
+  
       setLoading(false);
-
+  
       if (res.ok) {
         // Dispatch signInSuccess to store user data in Redux
         dispatch(signInSuccess(data));
-        navigate("/"); // Redirect to home or dashboard after successful login
+        navigate("/profile"); // Redirect to profile after successful login
       } else {
         // Dispatch signInFailure to set error message in Redux
         dispatch(signInFailure(data.message));
@@ -53,6 +53,7 @@ export default function SignIn() {
       alert("Something went wrong. Please try again.");
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
