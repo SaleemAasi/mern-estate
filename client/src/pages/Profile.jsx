@@ -1,49 +1,99 @@
 import { useSelector, useDispatch } from "react-redux";
-import { signOut } from "../redux/user/userSlice";
+import { signOut, updateUserStart, updateUserSuccess, updateFailure } from "../redux/user/userSlice";
 import { useState, useEffect } from "react";
 
 export default function Profile() {
-  const { user } = useSelector((state) => state.user); // Get the user from Redux store
+  const { user } = useSelector((state) => state.user); // Get user and token from Redux store
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    name: "",
+    username: "", // Changed 'name' to 'username'
     email: "",
-    profileImage: "",
+    password: "",
   });
 
-  // Update form data when the user object changes
   useEffect(() => {
     if (user) {
-      console.log("User data:", user); // Debugging user data
+      console.log("User object from Redux:", user);
       setFormData({
-        name: user.username || "", // Set the name from the user object
-        email: user.email || "", // Set the email from the user object
-        profileImage: user.profileImage || "", // Set the profile image if available
+        username: user.username || "",
+        email: user.email || "",
+        password: "",
       });
     }
-  }, [user]); // Re-run this effect whenever 'user' changes
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Dispatch an action to update the user profile (optional)
-    console.log("Updated Profile Data:", formData);
+    console.log("Updating profile...");
+
+    try {
+      dispatch(updateUserStart());
+
+      console.log("Sending request to backend...");
+
+      const res = await fetch(`/api/user/update/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      console.log("Response from backend:", data);
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update user");
+      }
+
+      dispatch(updateUserSuccess(data.user)); // Update user info in Redux
+      console.log("Profile updated successfully:", data);
+    } catch (error) {
+      dispatch(updateFailure(error.message));
+      console.error("Error updating profile:", error);
+    }
   };
 
   const handleSignOut = () => {
     dispatch(signOut());
   };
 
-  const handleDeleteAccount = () => {
-    // Dispatch an action to delete the account (optional)
-    console.log("Account Deleted");
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+  
+    if (!confirmDelete) return;
+  
+    try {
+      const res = await fetch(`/api/user/delete/${user._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+  
+      const data = await res.json();
+      console.log("Delete response:", data);
+  
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to delete account");
+      }
+  
+      dispatch(signOut()); // Sign out the user after deletion
+      alert("Your account has been deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Failed to delete account. Please try again.");
+    }
   };
+  
 
-  // Check if user is loading
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -52,26 +102,15 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <h2 className="text-3xl font-bold text-center mb-8">Profile</h2>
-
-        {/* Profile Image */}
-        <div className="flex justify-center mb-8">
-          <img
-            src={formData.profileImage || "https://static.vecteezy.com/system/resources/thumbnails/005/544/770/small/profile-icon-design-free-vector.jpg"}
-            alt="Profile"
-            className="w-32 h-32 rounded-full object-cover border-4 border-yellow-400"
-          />
-        </div>
-
-        {/* Profile Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Name
             </label>
             <input
               type="text"
-              id="name"
-              value={formData.name}
+              id="username" // Changed from 'name' to 'username'
+              value={formData.username}
               onChange={handleChange}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
@@ -91,19 +130,18 @@ export default function Profile() {
           </div>
 
           <div>
-            <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">
-              Profile Image URL
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              New Password
             </label>
             <input
-              type="url"
-              id="profileImage"
-              value={formData.profileImage}
+              type="password"
+              id="password"
+              value={formData.password}
               onChange={handleChange}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
 
-          {/* Update Button */}
           <button
             type="submit"
             className="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300"
@@ -112,7 +150,6 @@ export default function Profile() {
           </button>
         </form>
 
-        {/* Sign Out Button */}
         <button
           onClick={handleSignOut}
           className="w-full mt-4 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300"
@@ -120,7 +157,6 @@ export default function Profile() {
           Sign Out
         </button>
 
-        {/* Delete Account Button */}
         <button
           onClick={handleDeleteAccount}
           className="w-full mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"

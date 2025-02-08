@@ -41,12 +41,12 @@ export const Signin = async (req, res, next) => {
         // Generate JWT token
         const token = jwt.sign(
             { id: validUser._id },
-            process.env.JWT_SECRET,  // Use environment variable for security
-             // Token expires in 1 hour
+            process.env.JWT_SECRET,  // Secret key from env variables
+            { expiresIn: '1h' }      // Add expiry to the token
         );
 
         // Send token in HTTP-only cookie
-        res.cookie('access_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+        res.cookie('access_token', token, { httpOnly: true })
            .status(200)
            .json({ message: 'User signed in successfully', user: userWithoutPassword });
     } catch (error) {

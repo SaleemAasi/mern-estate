@@ -37,15 +37,16 @@ export default function SignIn() {
   
       setLoading(false);
   
-      if (res.ok) {
-        // Dispatch signInSuccess to store user data in Redux
-        dispatch(signInSuccess(data));
-        navigate("/profile"); // Redirect to profile after successful login
-      } else {
-        // Dispatch signInFailure to set error message in Redux
-        dispatch(signInFailure(data.message));
-        alert(data.message);
-      }
+     // Assuming the response contains a token and user data
+if (res.ok) {
+  dispatch(signInSuccess({ user: data.user, token: data.token })); // Add token to state
+  localStorage.setItem('authToken', data.token);  // Optionally store token in localStorage
+  navigate("/profile"); // Redirect to profile after successful login
+} else {
+  dispatch(signInFailure(data.message));
+  alert(data.message);
+}
+
     } catch (error) {
       setLoading(false);
       console.error("Error during sign-in:", error);
@@ -114,7 +115,7 @@ export default function SignIn() {
 
         {/* Sign Up Link */}
         <p className="text-center text-gray-600">
-          Don't have an account?{" "}
+          Dont have an account?{" "}
           <Link to="/signup" className="text-yellow-500 font-semibold hover:underline">
             Sign Up
           </Link>
