@@ -42,7 +42,7 @@ export const Signin = async (req, res, next) => {
         const token = jwt.sign(
             { id: validUser._id },
             process.env.JWT_SECRET,  // Secret key from env variables
-            { expiresIn: '1h' }      // Add expiry to the token
+            { expiresIn: '1d' }      // Add expiry to the token
         );
 
         // Send token in HTTP-only cookie

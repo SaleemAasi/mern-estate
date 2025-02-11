@@ -20,9 +20,9 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(signInStart()); // Dispatch signInStart to set loading state to true
-  
+    
     setLoading(true);
-  
+    
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -31,22 +31,20 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData),
       });
-  
+    
       const data = await res.json();
       console.log(data);
-  
+    
       setLoading(false);
+    
+      if (res.ok) {
+        dispatch(signInSuccess({ user: data.user })); // Remove the token here, because it's in cookies
+        navigate("/profile"); // Redirect to profile after successful login
+      } else {
+        dispatch(signInFailure(data.message));
+        alert(data.message);
+      }
   
-     // Assuming the response contains a token and user data
-if (res.ok) {
-  dispatch(signInSuccess({ user: data.user, token: data.token })); // Add token to state
-  localStorage.setItem('authToken', data.token);  // Optionally store token in localStorage
-  navigate("/profile"); // Redirect to profile after successful login
-} else {
-  dispatch(signInFailure(data.message));
-  alert(data.message);
-}
-
     } catch (error) {
       setLoading(false);
       console.error("Error during sign-in:", error);
@@ -54,6 +52,7 @@ if (res.ok) {
       alert("Something went wrong. Please try again.");
     }
   };
+  
   
 
   return (
