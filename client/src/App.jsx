@@ -5,8 +5,10 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 import Signup from './pages/Signup';
 import Signin from './pages/Signin';
+
 import Header from './components/Header';
 import PrivateRoute from './components/PrivateRoute';
+import Createlisting from './pages/createlisting';
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
           {/* PrivateRoute wrapper to protect the Profile route */}
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/createlisting" element={<Createlisting/>} />
           </Route>
         </Routes>
       </div>
